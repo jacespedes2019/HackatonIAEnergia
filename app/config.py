@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+from supabase import create_client, Client
 
 # Load environment variables
 load_dotenv()
@@ -25,3 +26,11 @@ BASE_PUBLIC_URL = os.getenv("BASE_PUBLIC_URL", "http://localhost:8000")
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 AUDIO_DIR = os.path.join(BASE_DIR, "audio")
 os.makedirs(AUDIO_DIR, exist_ok=True)
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("SUPABASE_URL and SUPABASE_KEY must be set in environment")
+
+supabase_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
