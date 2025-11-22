@@ -1,4 +1,5 @@
 import json
+import re
 import google.generativeai as genai
 from app.models import Lead
 from typing import List, Dict
@@ -115,7 +116,7 @@ def build_response(
 
     # Build conversation history block (only last 5 turns to keep prompt small)
     history_block = ""
-    for turn in history[-5:]:
+    for turn in history[-2:]:
         user_prev = turn.get("user", "")
         agent_prev = turn.get("agent", "")
         history_block += f"Usuario: {user_prev}\nAgente: {agent_prev}\n\n"
@@ -189,8 +190,25 @@ Responde de forma natural y coherente con el mensaje del cliente.
         "siguiendo las reglas y objetivos anteriores. Mantén las respuestas cortas, "
         "conversacionales y naturales, como un vendedor experto que habla por teléfono."
     )
+    
+    # FUERZA QUE LAS RESPUESTAS SEAN CORTAS
+    hard_limit_block = """
+    REGLA ESTRICTA FINAL:
+    - Tu respuesta NO puede tener más de 3 oraciones.
+    - Cada oración debe ser corta, máximo 12 palabras.
+    - Mantén la respuesta en máximo 6–8 segundos de lectura.
+    - NO uses párrafos largos. NO expliques. NO des contexto adicional.
+    """
 
-    full_prompt = system_block + "\n" + history_text + "\n" + user_block
+    full_prompt = (
+    system_block
+    + "\n"
+    + history_text
+    + "\n"
+    + user_block
+    + "\n"
+    + hard_limit_block
+)
 
     response = model.generate_content(full_prompt)
     return (response.text or "").strip()

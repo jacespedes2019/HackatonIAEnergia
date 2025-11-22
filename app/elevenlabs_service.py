@@ -25,7 +25,7 @@ def generate_tts(text: str, prefix: str = "tts") -> str:
 
     payload = {
         "text": text,
-        "model_id": "eleven_multilingual_v2",
+        "model_id": "eleven_turbo_v2",
     }
 
     res = requests.post(url, json=payload, headers=headers)
